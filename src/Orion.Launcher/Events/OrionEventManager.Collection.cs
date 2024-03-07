@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Destructurama.Attributed;
 using Orion.Core.Events;
+using Orion.Core.Events.Projectiles;
 using Serilog;
 using Serilog.Events;
 
@@ -36,7 +37,7 @@ namespace Orion.Launcher.Events
 
             private readonly SortedSet<Registration> _registrations =
                 new SortedSet<Registration>(
-                    Comparer<Registration>.Create((r1, r2) => r1.Priority.CompareTo(r2.Priority)));
+                    Comparer<Registration>.Create((r1, r2) => r1.Priority == r2.Priority ? 1 : r1.Priority.CompareTo(r2.Priority)));
 
             private readonly HashSet<AsyncRegistration> _asyncRegistrations = new HashSet<AsyncRegistration>();
 

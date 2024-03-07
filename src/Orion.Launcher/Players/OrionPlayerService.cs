@@ -100,7 +100,7 @@ namespace Orion.Launcher.Players
             On.Terraria.Player.Update += PreUpdateHandler;
             On.Terraria.RemoteClient.Reset += PreResetHandler;
 
-            _events.RegisterHandlers(this, _log);
+            _events.RegisterHandlers(this, _log); 
 
             PacketHandler MakeOnReceivePacketHandler(Type packetType) =>
                 (PacketHandler)_onReceivePacket

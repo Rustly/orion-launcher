@@ -30,6 +30,7 @@ using ReLogic.OS;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using Terraria.Initializers;
 
 namespace Orion.Launcher
 {
@@ -45,9 +46,8 @@ namespace Orion.Launcher
         internal static void Main(string[] args)
         {
             SetUpTerrariaLanguage();
-            //Terraria.Program.LaunchOTAPI();
-            Terraria.Program.SavePath = Platform.Get<IPathService>().GetStoragePath("Terraria"); // since launchgame in program isnt called in init, this needs to be set
-            //Terraria.Program.LaunchParameters = Terraria.Utils.ParseArguements(args);
+            Terraria.Program.LaunchOTAPI();
+            Terraria.Program.SavePath = Platform.Get<IPathService>().GetStoragePath("Terraria"); // needs to be set before server is set up
 
             var log = SetUpLog();
             using var server = SetUpServer(log);
@@ -55,10 +55,14 @@ namespace Orion.Launcher
 
             server.Events.Raise(new ServerArgsEvent(args), log);
 
-            //using var game = new Terraria.Main();
-            //game.DedServ();
-            Terraria.Program.orig_LaunchGame(args);
+            Terraria.Main.dedServ = true;
 
+            using var game = new Terraria.Main();
+            LaunchInitializer.LoadParameters(game);
+            game.DedServ();
+            //Terraria.Program.orig_RunGame(); // arguably this could be done before setting up the server to fix errors but the project im maintaining this for hijacks the startup anyway so this works for me.
+
+            Terraria.Program.ShutdownOTAPI();
 
             // Sets up the Terraria language.
             static void SetUpTerrariaLanguage()
@@ -71,7 +75,7 @@ namespace Orion.Launcher
                 Thread.CurrentThread.CurrentUICulture = previousUICulture;
             }
 
-            // Sets up a log which outputs to the console and to the logs/ directory.
+            // Sets up a log which outputs to the console and to the logs/ directory.but 
             static ILogger SetUpLog()
             {
                 Directory.CreateDirectory("logs");

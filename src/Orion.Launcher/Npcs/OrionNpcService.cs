@@ -122,7 +122,8 @@ namespace Orion.Launcher.Npcs
             }
 
             var npc = GetNpc(terrariaNpc);
-            var evt = new NpcDefaultsEvent(npc) { Id = (NpcId)npcId };
+            var evt = new NpcDefaultsEvent(npc, new(spawnparams.sizeScaleOverride, spawnparams.playerCountForMultiplayerDifficultyOverride, spawnparams.strengthMultiplierOverride)) 
+            { Id = (NpcId)npcId };
             _events.Raise(evt, _log);
             if (evt.IsCanceled)
             {
@@ -134,6 +135,10 @@ namespace Orion.Launcher.Npcs
             {
                 _setDefaultsToIgnore.Value = 2;
             }
+
+            spawnparams.playerCountForMultiplayerDifficultyOverride = evt.SpawnParameters.PlayercountScaleOverride;
+            spawnparams.sizeScaleOverride = evt.SpawnParameters.SizeMultiplierOverride;
+            spawnparams.strengthMultiplierOverride = evt.SpawnParameters.StrengthMultiplierOverride;
 
             orig(terrariaNpc, npcId, spawnparams);
         }
